@@ -10,8 +10,6 @@
 #include "scrabble.h"
 
 
-
-
 // Funcion para leer un archivo y obtener un vector de palabras
 std::vector<std::string> leerArchivo(const std::string &nombreArchivo) {
   //// Vector para almacenar las palabras
@@ -61,6 +59,8 @@ bool palabraEnArchivos(const std::string &palabra, const std::string &archivo1,
              palabrasArchivo2.end();
 }
 
+
+
 // Funcion para mostar los comandos disponibles
 void Interfaz_Scrabble::mostrarListaComandos() {
   std::cout << "---------------------------------" << std::endl;
@@ -73,9 +73,10 @@ void Interfaz_Scrabble::mostrarListaComandos() {
   std::cout << "3. puntaje_palabra <palabra>" << std::endl;
   std::cout << "4. inicializar_arbol" << std::endl;
   std::cout << "5. palabras_por_prefijo" << std::endl;
-  std::cout << "6. grafo_de_palabras" << std::endl;
-  std::cout << "7. posibles_palabras" << std::endl;
-  std::cout << "8. salir" << std::endl;
+  std::cout << "6. palabras_por_sufijo" <<std::endl;
+  std::cout << "7. grafo_de_palabras" << std::endl;
+  std::cout << "8. posibles_palabras" << std::endl;
+  std::cout << "9. salir" << std::endl;
   std::cout << "---------------------------------\n" << std::endl;
   std::cout << "** Escriba 'ayuda <comando>' para obtener información sobre "
                "los comandos disponibles. **"
@@ -108,7 +109,12 @@ void Interfaz_Scrabble::mostrarAyudaComando(std::string comando) {
     std::cout << "Comando 'palabras_por_prefijo': Muestra todas las palabras "
                  "posibles a construir a partir de un prefijo dado."
               << std::endl;
-    std::cout << "Uso: palabras_por_prefijo" << std::endl;
+    std::cout << "Uso: palabras_por_prefijo <prefijo>" << std::endl;
+   } else if (comando == "palabras_por_sufijo") {
+    std::cout << "Comando 'palabras_por_sufijo': Muestra todas las palabras "
+                 "posibles a construir a partir de un sufijo dado."
+              << std::endl;
+    std::cout << "Uso: palabras_por_sufijo <sufijo>" << std::endl;
   } else if (comando == "grafo_de_palabras") {
     std::cout << "Comando 'grafo_de_palabras': Construye un grafo de palabras "
                  "a partir del diccionario."
@@ -165,6 +171,9 @@ void Interfaz_Scrabble::procesarComando(std::string comando) {
   } else if (primerPalabra == "palabras_por_prefijo") {
     std::string prefijo = comando.substr(comando.find(' ') + 1);
     palabrasPorPrefijo(prefijo);
+  }else if (primerPalabra == "palabras_por_sufijo") {
+    std::string sufijo = comando.substr(comando.find(' ') + 1);
+    palabrasPorSufijo(sufijo);
   } else if (primerPalabra == "grafo_de_palabras") {
     grafoDePalabras();
   } else if (primerPalabra == "posibles_palabras") {
@@ -427,6 +436,16 @@ void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
         }
     }
 }
+
+void Interfaz_Scrabble::buscarPalabrasPorSufijo(Nodo* nodo, const std::string& sufijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas){
+  std::cout<<"Bien";
+}
+
+void Interfaz_Scrabble::palabrasPorSufijo(std::string sufijo){
+  std::cout<<"Bien 2";
+}
+
+
 
 void Interfaz_Scrabble::grafoDePalabras() {
   // Implementación de construcción de grafo de palabras
