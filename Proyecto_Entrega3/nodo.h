@@ -26,5 +26,4 @@ public:
     const std::unordered_map<char, Nodo*>& getHijos() const;
 };
 
-
 #endif // NODO_H

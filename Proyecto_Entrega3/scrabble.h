@@ -13,7 +13,7 @@
 
 struct Interfaz_Scrabble {
 private:
-    Arbol* arbol;
+    Arbol arbol;
     Arbol* diccionarioOriginal;
     Arbol* diccionarioInvertido;
 
@@ -22,10 +22,8 @@ private:
     bool arbolInicializado = false;
     bool arbolInvertidoInicializado = false;
 
-
 public:
-    Interfaz_Scrabble(): arbol(nullptr), diccionarioOriginalInicializado(false), diccionarioInversoInicializado(false) {}
-
+Interfaz_Scrabble(): diccionarioOriginalInicializado(false), diccionarioInversoInicializado(false) {}
     void mostrarListaComandos();
     void mostrarAyudaComando(std::string comando);
     void procesarComando(std::string comando);
@@ -34,8 +32,8 @@ public:
     int puntajePalabra(std::string palabraABuscar);
     void inicializarArbol(std::string nombreArchivo = "");
     void inicializarArbolInverso(std::string nombreArchivo = "");
-    void palabrasPorPrefijo(const std::string& prefijo);
-    void buscarPalabrasPorPrefijo(Nodo* nodoActual, const std::string& prefijo, std::string palabra, std::vector<std::string>& palabrasEncontradas);
+    void palabrasPorPrefijo(std::string prefijo);
+    void buscarPalabrasPorPrefijo(Nodo* nodo, const std::string& prefijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas);
     void palabrasPorSufijo(std::string sufijo);
     void grafoDePalabras();
     void posiblesPalabras();

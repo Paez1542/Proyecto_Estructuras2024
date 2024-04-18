@@ -7,12 +7,11 @@
 class Arbol {
 private:
   Nodo *raiz;
-  int contador;
 
 public:
   Arbol();
   ~Arbol();
-  int size() const;
+
   void insertarPalabra(const std::string &palabra);
   bool buscarPalabra(const std::string &palabra) const;
   bool estaVacio() const;

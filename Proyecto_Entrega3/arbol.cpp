@@ -3,14 +3,9 @@
 
 
 Arbol::Arbol() : raiz(new Nodo('\0')) {}
-//Arbol::Arbol() : raiz(nullptr), contador(0) {}
 
 Arbol::~Arbol() {
     delete raiz; // Esto liberará recursivamente toda la estructura del árbol
-}
-
-int Arbol::size() const {
-    return contador;
 }
 
 void Arbol::insertarPalabra(const std::string& palabra) {
