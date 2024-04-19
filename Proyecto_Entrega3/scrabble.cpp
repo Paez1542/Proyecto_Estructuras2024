@@ -64,7 +64,7 @@ bool palabraEnArchivos(const std::string &palabra, const std::string &archivo1,
 // Funcion para mostar los comandos disponibles
 void Interfaz_Scrabble::mostrarListaComandos() {
   std::cout << "---------------------------------" << std::endl;
-  std::cout << "** SISTEMA DE APOYO DE SCRABBLE **" << std::endl;
+  std::cout << "* SISTEMA DE APOYO DE SCRABBLE *" << std::endl;
   std::cout << "---------------------------------" << std::endl;
 
   std::cout << "\n** LISTA DE COMANDOS **\n" << std::endl;
@@ -332,6 +332,7 @@ void Interfaz_Scrabble::iniciarDiccionarioInverso(std::string nombreArchivo) {
 
 
 void Interfaz_Scrabble::inicializarArbol(std::string nombreArchivo) {
+  
     if (arbolInicializado) {
         std::cout << "(Árbol ya inicializado) El árbol del diccionario ya ha sido inicializado." << std::endl;
         return;
@@ -425,24 +426,63 @@ void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
         std::cerr << "(Prefijo inválido) No se encontraron palabras que comiencen con el prefijo '" << prefijo << "'." << std::endl;
         return;
     }
-
+    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
     std::cout << "(Resultado exitoso) Las palabras que inician con el prefijo '" << prefijo << "' son:" << std::endl;
+    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
     for (const auto& palabra : palabrasEncontradas) {
         int puntaje = puntajePalabra(palabra);
         if (puntaje == -1) {
             std::cerr << "Error: No se pudo calcular el puntaje para la palabra '" << palabra << "'." << std::endl;
         } else {
+          std::cout << "........................." << std::endl;
             std::cout << palabra << " - Longitud: " << palabra.length() << " - Puntaje: " << puntaje << std::endl;
         }
     }
 }
 
-void Interfaz_Scrabble::buscarPalabrasPorSufijo(Nodo* nodo, const std::string& sufijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas){
-  std::cout<<"Bien";
+void Interfaz_Scrabble::buscarPalabrasPorSufijo(Nodo* nodo, const std::string& sufijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas) {
+    if (!nodo) {
+        return;
+    }
+
+    // Si la palabra actual tiene una longitud igual o mayor al sufijo
+    // y el sufijo coincide con el final de la palabra, entonces la palabra es una coincidencia.
+    if (palabra.length() >= sufijo.length() && palabra.substr(palabra.length() - sufijo.length()) == sufijo) {
+        palabrasEncontradas.push_back(palabra);
+    }
+
+    // Recorremos todos los hijos del nodo actual.
+    for (const auto& par : nodo->getHijos()) {
+        char caracter = par.first;
+        Nodo* hijo = par.second;
+        
+        // Llamamos recursivamente a la función para cada hijo del nodo.
+        buscarPalabrasPorSufijo(hijo, sufijo, palabra + caracter, palabrasEncontradas);
+    }
 }
 
-void Interfaz_Scrabble::palabrasPorSufijo(std::string sufijo){
-  std::cout<<"Bien 2";
+
+void Interfaz_Scrabble::palabrasPorSufijo(std::string sufijo) {
+    std::vector<std::string> palabrasEncontradas;
+    
+    // Llamamos a la función buscarPalabrasPorSufijo con el nodo raíz del árbol y el sufijo dado.
+    buscarPalabrasPorSufijo(arbol.getRaiz(), sufijo, "", palabrasEncontradas); // Suponiendo que 'arbol' es el árbol del diccionario
+    
+    // Mostramos las palabras encontradas en la salida estándar.
+    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
+    std::cout << "(Resultado exitoso) Las palabras que inician con el sufijo '" << sufijo << "' son:" << std::endl;
+    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
+
+    
+    for (const auto& palabra : palabrasEncontradas) {
+       int puntaje = puntajePalabra(palabra);
+       if (puntaje == -1) {
+        std::cerr << "Error: No se pudo calcular el puntaje para la palabra '" << palabra << "'." << std::endl;
+        } else {
+          std::cout << "................................." << std::endl;
+            std::cout << palabra << " - Longitud: " << palabra.length() << " - Puntaje: " << puntaje << std::endl;
+      }
+  }
 }
 
 
