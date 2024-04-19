@@ -6,20 +6,29 @@
 
 class Arbol {
 private:
-  Nodo *raiz;
+    Nodo* raiz;
 
 public:
-  Arbol();
-  ~Arbol();
+    // Constructor: inicializa el árbol con una raíz nula
+    Arbol();
 
-  void insertarPalabra(const std::string &palabra);
-  bool buscarPalabra(const std::string &palabra) const;
-  bool estaVacio() const;
-  Nodo* getHijo(char c) const;
-  Nodo* getRaiz() const;
+    // Destructor: libera la memoria de la raíz y todos sus hijos
+    ~Arbol();
 
+    // Inserta una palabra en el árbol
+    void insertarPalabra(const std::string& palabra);
 
+    // Busca una palabra en el árbol y devuelve true si está presente, false si no
+    bool buscarPalabra(const std::string& palabra) const;
+
+    // Comprueba si el árbol está vacío (no tiene raíz)
+    bool estaVacio() const;
+
+    // Obtiene el hijo de la raíz con el caracter dado
+    Nodo* getHijo(char c) const;
+
+    // Getter para la raíz del árbol
+    Nodo* getRaiz() const;
 };
-//#include "arbol.cpp"
-#endif // ARBOL_H
 
+#endif // ARBOL_H
