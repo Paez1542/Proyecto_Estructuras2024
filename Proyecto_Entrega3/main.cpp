@@ -15,6 +15,8 @@ int main() {
   interfaz.mostrarListaComandos();
 
   do {
+    
+    std::cout << "..........................." << std::endl;
 
     std::cout << "$ ";
     // Leer el comando ingresado por el usuario

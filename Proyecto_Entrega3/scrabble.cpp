@@ -71,12 +71,13 @@ void Interfaz_Scrabble::mostrarListaComandos() {
   std::cout << "1. inicializar <nombre_archivo>" << std::endl;
   std::cout << "2. inicializar_inverso <nombre_archivo>" << std::endl;
   std::cout << "3. puntaje_palabra <palabra>" << std::endl;
-  std::cout << "4. inicializar_arbol" << std::endl;
-  std::cout << "5. palabras_por_prefijo" << std::endl;
-  std::cout << "6. palabras_por_sufijo" <<std::endl;
-  std::cout << "7. grafo_de_palabras" << std::endl;
-  std::cout << "8. posibles_palabras" << std::endl;
-  std::cout << "9. salir" << std::endl;
+  std::cout << "4. inicializar_arbol <nombre_archivo>"<< std::endl;
+  std::cout << "5. inicializar_arbol_inverso <nombre_archivo>"<< std::endl;
+  std::cout << "6. palabras_por_prefijo" << std::endl;
+  std::cout << "7. palabras_por_sufijo" <<std::endl;
+  std::cout << "8. grafo_de_palabras" << std::endl;
+  std::cout << "9. posibles_palabras" << std::endl;
+  std::cout << "10. salir" << std::endl;
   std::cout << "---------------------------------\n" << std::endl;
   std::cout << "** Escriba 'ayuda <comando>' para obtener información sobre "
                "los comandos disponibles. **"
@@ -100,11 +101,16 @@ void Interfaz_Scrabble::mostrarAyudaComando(std::string comando) {
                  "especificada."
               << std::endl;
     std::cout << "Uso: puntaje_palabra <palabra>" << std::endl;
-  } else if (comando == "inicializar_arbol") {
+  } else if (comando == "inicializar_arbol <nombre_archivo>") {
     std::cout << "Comando 'inicializar_arbol': Inicializa la estructura de "
                  "datos para almacenar las palabras del diccionario."
               << std::endl;
-    std::cout << "Uso: inicializar_arbol" << std::endl;
+    std::cout << "Uso: inicializar_arbol <nombre_archivo>" << std::endl;
+  }else if (comando == "inicializar_arbol_inverso <nombre_archivo>") {
+    std::cout << "Comando 'inicializar_arbol_inverso': Inicializa la estructura de "
+                 "datos para almacenar las palabras del diccionario inverso."
+              << std::endl;
+    std::cout << "Uso: inicializar_arbol <nombre_archivo>" << std::endl;
   } else if (comando == "palabras_por_prefijo") {
     std::cout << "Comando 'palabras_por_prefijo': Muestra todas las palabras "
                  "posibles a construir a partir de un prefijo dado."
@@ -162,12 +168,19 @@ void Interfaz_Scrabble::procesarComando(std::string comando) {
     // partir del archivo especificado
     std::string nombreArchivo = comando.substr(comando.find(' ') + 1);
     iniciarDiccionarioInverso(nombreArchivo);
+
   } else if (primerPalabra == "puntaje_palabra") {
     std::string palabraABuscar = comando.substr(comando.find(' ') + 1);
-
     puntajePalabra(palabraABuscar);
+
   } else if (primerPalabra == "inicializar_arbol") {
-    inicializarArbol();
+    std::string nombreArchivo = comando.substr(comando.find(' ') + 1);
+    inicializarArbol(nombreArchivo);
+
+  } else if (primerPalabra == "inicializar_arbol_inverso") {
+    std::string nombreArchivo = comando.substr(comando.find(' ') + 1);
+    inicializarArbolInverso(nombreArchivo);
+
   } else if (primerPalabra == "palabras_por_prefijo") {
     std::string prefijo = comando.substr(comando.find(' ') + 1);
     palabrasPorPrefijo(prefijo);
@@ -208,10 +221,10 @@ void Interfaz_Scrabble::inicializarDiccionario(std::string nombreArchivo) {
   }
   std::cout << "---------------------------------" << std::endl;
 
-  inicializarArbol(nombreArchivo);
-  arbolInicializado = true;
+  //inicializarArbol(nombreArchivo);
+  //arbolInicializado = true;
 
-  std::cout << "---------------------------------" << std::endl;
+  //std::cout << "---------------------------------" << std::endl;
 
 }
 
@@ -249,9 +262,9 @@ void Interfaz_Scrabble::iniciarDiccionarioInverso(std::string nombreArchivo) {
               << std::endl;
   }
   std::cout << "---------------------------------" << std::endl;
-  inicializarArbolInverso(nombreArchivo);
-    arbolInvertidoInicializado = true;
-  std::cout << "---------------------------------" << std::endl;
+  //inicializarArbolInverso(nombreArchivo);
+  //arbolInvertidoInicializado = true;
+  //std::cout << "---------------------------------" << std::endl;
 
 }
 
@@ -380,7 +393,7 @@ void Interfaz_Scrabble::inicializarArbolInverso(std::string nombreArchivo) {
                     return std::isalpha(c);
                 });
                 if (esValida) {
-                    //std::reverse(palabra.begin(), palabra.end()); // Invertir la palabra
+                    std::reverse(palabra.begin(), palabra.end()); // Invertir la palabra
                     arbolInverso.insertarPalabra(palabra);
                 }
             }
@@ -395,6 +408,7 @@ void Interfaz_Scrabble::inicializarArbolInverso(std::string nombreArchivo) {
 }
 
 void Interfaz_Scrabble::buscarPalabrasPorPrefijo(Nodo* nodo, const std::string& prefijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas) {
+    
     if (!nodo) {
         return;
     }
@@ -412,6 +426,8 @@ void Interfaz_Scrabble::buscarPalabrasPorPrefijo(Nodo* nodo, const std::string& 
 }
 
 void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
+    std::transform(prefijo.begin(), prefijo.end(), prefijo.begin(), ::tolower);
+
     if (!arbolInicializado) {
         std::cerr << "(Árbol no inicializado) Debe inicializar el árbol primero." << std::endl;
         return;
@@ -463,6 +479,8 @@ void Interfaz_Scrabble::buscarPalabrasPorSufijo(Nodo* nodo, const std::string& s
 
 
 void Interfaz_Scrabble::palabrasPorSufijo(std::string sufijo) {
+    std::transform(sufijo.begin(), sufijo.end(), sufijo.begin(), ::tolower);
+
     std::vector<std::string> palabrasEncontradas;
     
     // Llamamos a la función buscarPalabrasPorSufijo con el nodo raíz del árbol y el sufijo dado.
