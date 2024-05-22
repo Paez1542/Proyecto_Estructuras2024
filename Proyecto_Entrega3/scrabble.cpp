@@ -469,9 +469,9 @@ void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
         std::cerr << "(Prefijo inválido) No se encontraron palabras que comiencen con el prefijo '" << prefijo << "'." << std::endl;
         return;
     }
-    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
+    std::cout << "--------------------------------" << std::endl;
     std::cout << "(Resultado exitoso) Las palabras que inician con el prefijo '" << prefijo << "' son:" << std::endl;
-    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
     
     // Mostrar las palabras encontradas junto con su longitud y puntaje.
     for (const auto& palabra : palabrasEncontradas) {
