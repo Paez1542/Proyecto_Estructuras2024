@@ -6,59 +6,45 @@
 #include <string>
 
 #include "arbol.h"
-#include "nodo.h" 
 #include "scrabble.h"
 
 
-// Funcion para leer un archivo y obtener un vector de palabras
 std::vector<std::string> leerArchivo(const std::string &nombreArchivo) {
-  //// Vector para almacenar las palabras
-  std::vector<std::string> palabras;
-  // abre el archivo
-  std::ifstream archivo(nombreArchivo);
-  std::string palabra;
+    std::vector<std::string> palabras;
+    std::ifstream archivo(nombreArchivo);
+    std::string palabra;
 
-  // Lee cada palabra del archivo y la agrega al vector
-  if (archivo.is_open()) {
-    while (getline(archivo, palabra)) {
-       std::transform(palabra.begin(), palabra.end(), palabra.begin(), ::tolower);
-      // Verifica que la palabra contenga caracteres especiales y o invalidos
-      bool contieneCaracteresInvalidos = false;
-      // recorrer cada caracter de la palabra
-      for (char c : palabra) {
-        // Si no es una letra marca que hay caracteres invalidos
-        if (!isalpha(c)) {
-          contieneCaracteresInvalidos = true;
-          break;
+    if (archivo.is_open()) {
+        while (getline(archivo, palabra)) {
+            std::transform(palabra.begin(), palabra.end(), palabra.begin(), ::tolower);
+            bool contieneCaracteresInvalidos = false;
+            for (char c : palabra) {
+                if (!isalpha(c)) {
+                    contieneCaracteresInvalidos = true;
+                    break;
+                }
+            }
+            if (!contieneCaracteresInvalidos) {
+                palabras.push_back(palabra);
+            }
         }
-      }
-      // Si no hay caracteres invalidos la agrega al vector
-      if (!contieneCaracteresInvalidos) {
-        palabras.push_back(palabra);
-      }
+        archivo.close();
+    } else {
+        std::cerr << "No se pudo abrir el archivo " << nombreArchivo << std::endl;
     }
-    archivo.close();
-  } else {
-    std::cerr << "No se pudo abrir el archivo " << nombreArchivo << std::endl;
-  }
-  // Retorna el vecto de palabras
-  return palabras;
+    return palabras;
 }
 
-// Funcion para verificar si una palabra se encuentra en dos archivos
 bool palabraEnArchivos(const std::string &palabra, const std::string &archivo1,
                        const std::string &archivo2) {
-  // Lee los vectores de palabras de los archivos
-  auto palabrasArchivo1 = leerArchivo(archivo1);
-  auto palabrasArchivo2 = leerArchivo(archivo2);
+    auto palabrasArchivo1 = leerArchivo(archivo1);
+    auto palabrasArchivo2 = leerArchivo(archivo2);
 
-  // Busca la palabra en ambos vectores
-  return std::find(palabrasArchivo1.begin(), palabrasArchivo1.end(), palabra) !=
+    return std::find(palabrasArchivo1.begin(), palabrasArchivo1.end(), palabra) !=
              palabrasArchivo1.end() ||
          std::find(palabrasArchivo2.begin(), palabrasArchivo2.end(), palabra) !=
              palabrasArchivo2.end();
 }
-
 
 
 // Funcion para mostar los comandos disponibles
@@ -190,7 +176,8 @@ void Interfaz_Scrabble::procesarComando(std::string comando) {
   } else if (primerPalabra == "grafo_de_palabras") {
     grafoDePalabras();
   } else if (primerPalabra == "posibles_palabras") {
-    posiblesPalabras();
+    std::string letras = comando.substr(comando.find(' ') + 1); 
+    posiblesPalabras(letras); 
   } else if (primerPalabra == "salir" || primerPalabra == "exit") {
     std::cout << "---------------------------------" << std::endl;
     std::cout << "Gracias por usar el programa, la buena" << std::endl;
@@ -205,7 +192,7 @@ void Interfaz_Scrabble::procesarComando(std::string comando) {
 }
 
 // Funcion para inicializar el diccionario a partir de un archivo
-void Interfaz_Scrabble::inicializarDiccionario(std::string nombreArchivo) {
+/*void Interfaz_Scrabble::inicializarDiccionario(std::string nombreArchivo) {
   std::cout << "Inicializando diccionario desde el archivo: " << nombreArchivo
             << std::endl;
 
@@ -219,18 +206,32 @@ void Interfaz_Scrabble::inicializarDiccionario(std::string nombreArchivo) {
     std::cerr << "El diccionario no fue inicializado correctamente."
               << std::endl;
   }
-  std::cout << "---------------------------------" << std::endl;
-
-  //inicializarArbol(nombreArchivo);
-  //arbolInicializado = true;
-
-  //std::cout << "---------------------------------" << std::endl;
-
 }
+*/
 
+void Interfaz_Scrabble::inicializarDiccionario(std::string nombreArchivo) {
+    std::ifstream archivo(nombreArchivo);
+    std::string palabra;
 
+    if (archivo.is_open()) {
+        while (archivo >> palabra) {
+            // Convertir palabra a minúsculas
+            std::transform(palabra.begin(), palabra.end(), palabra.begin(), ::tolower);
+            diccionario.insert(palabra);
+        }
+        archivo.close();
+        diccionarioOriginalInicializado = true;
+        std::cout << "El diccionario fue inicializado correctamente." << std::endl;
 
-
+        // Depuración: Mostrar el contenido del diccionario
+        std::cout << "Contenido del diccionario:" << std::endl;
+        for (const auto& palabra : diccionario) {
+            std::cout << palabra << std::endl;
+        }
+    } else {
+        std::cerr << "Error al abrir el archivo: " << nombreArchivo << std::endl;
+    }
+}
 
 
 // Funcion para inicializar el diccionario inverso a partir de un archivo
@@ -261,11 +262,6 @@ void Interfaz_Scrabble::iniciarDiccionarioInverso(std::string nombreArchivo) {
                  "diccionario inverso."
               << std::endl;
   }
-  std::cout << "---------------------------------" << std::endl;
-  //inicializarArbolInverso(nombreArchivo);
-  //arbolInvertidoInicializado = true;
-  //std::cout << "---------------------------------" << std::endl;
-
 }
 
 // Funcion para calcular el puntaje de una palabra
@@ -273,7 +269,7 @@ void Interfaz_Scrabble::iniciarDiccionarioInverso(std::string nombreArchivo) {
   int Interfaz_Scrabble::puntajePalabra(std::string palabraABuscar) {
     std::transform(palabraABuscar.begin(), palabraABuscar.end(), palabraABuscar.begin(), ::tolower);
 
-    if (!diccionarioOriginalInicializado && !diccionarioInversoInicializado) {
+    if ((!diccionarioOriginalInicializado && !diccionarioInversoInicializado) && (!arbolInicializado && !arbolInvertidoInicializado)) {
         std::cerr << "Error: Los archivos no han sido inicializados correctamente." << std::endl;
         return -1; // Retornar un valor inválido para indicar un error
     }
@@ -342,211 +338,234 @@ void Interfaz_Scrabble::iniciarDiccionarioInverso(std::string nombreArchivo) {
     return puntaje; // Devolver el puntaje calculado
 }
 
-
-
-// Función para inicializar el árbol de palabras a partir de un archivo.
 void Interfaz_Scrabble::inicializarArbol(std::string nombreArchivo) {
-    // Verificar si el árbol ya está inicializado.
-    if (arbolInicializado) {
-        std::cout << "(Árbol ya inicializado) El árbol del diccionario ya ha sido inicializado." << std::endl;
-        return;
+    std::cout << "Inicializando árbol desde el archivo: " << nombreArchivo << std::endl;
+    std::vector<std::string> palabras = leerArchivo(nombreArchivo);
+    for (const std::string &palabra : palabras) {
+        arbol.insertarPalabra(palabra);
     }
-
-    // Abrir el archivo para lectura.
-    std::ifstream archivo(nombreArchivo);
-    if (!archivo.is_open()) {
-        std::cerr << "(Archivo no existe) El archivo " << nombreArchivo << " no existe o no puede ser leído." << std::endl;
-        return;
-    }
-
-    std::string palabra;
-    // Leer cada palabra del archivo y agregarla al árbol si es válida.
-    while (std::getline(archivo, palabra)) {
-        // Convertir la palabra a minúsculas.
-        std::transform(palabra.begin(), palabra.end(), palabra.begin(), ::tolower);
-        bool contieneCaracteresInvalidos = false;
-        // Verificar si la palabra contiene caracteres no alfabéticos.
-        for (char c : palabra) {
-            if (!isalpha(c)) {
-                contieneCaracteresInvalidos = true;
-                break;
-            }
-        }
-        // Si la palabra es válida, insertarla en el árbol.
-        if (!contieneCaracteresInvalidos) {
-            arbol.insertarPalabra(palabra);
-        }
-    }
-
-    archivo.close();
-
-    // Verificar si el árbol se inicializó correctamente.
-    if (!arbol.estaVacio()) {
-        std::cout << "(Resultado exitoso) El árbol del diccionario se ha inicializado correctamente." << std::endl;
-        arbolInicializado = true;
-    } else {
-        std::cerr << "Error: No se pudo inicializar el árbol del diccionario." << std::endl;
-    }
+    arbolInicializado = true;
+    std::cout << "Árbol inicializado correctamente." << std::endl;
 }
 
-// Función para inicializar el árbol de palabras inverso a partir de un archivo.
 void Interfaz_Scrabble::inicializarArbolInverso(std::string nombreArchivo) {
-    // Verificar si el árbol inverso ya está inicializado.
-    if (!diccionarioInversoInicializado) {
-        // Abrir el archivo para lectura.
-        std::ifstream archivo(nombreArchivo);
-        if (archivo.is_open()) {
-            std::string palabra;
-            // Transformar cada palabra a minúsculas e invertirla, luego agregarla al árbol inverso.
-            while (std::getline(archivo, palabra)) {
-                // Convertir la palabra a minúsculas.
-                std::transform(palabra.begin(), palabra.end(), palabra.begin(), ::tolower);
-                // Verificar si la palabra contiene solo caracteres alfabéticos.
-                bool esValida = std::all_of(palabra.begin(), palabra.end(), [](char c) {
-                    return std::isalpha(c);
-                });
-                // Si la palabra es válida, invertirla y agregarla al árbol inverso.
-                if (esValida) {
-                    std::reverse(palabra.begin(), palabra.end()); // Invertir la palabra
-                    arbolInverso.insertarPalabra(palabra);
-                }
-            }
-            diccionarioInversoInicializado = true;
-            std::cout << "(Resultado exitoso) El árbol del diccionario inverso se ha inicializado correctamente.\n";
-        } else {
-            std::cout << "(Archivo no existe) El archivo " << nombreArchivo << " no existe o no puede ser leído.\n";
+    std::cout << "Inicializando árbol inverso desde el archivo: " << nombreArchivo << std::endl;
+    std::vector<std::string> palabras = leerArchivo(nombreArchivo);
+    for (std::string palabra : palabras) {
+        std::reverse(palabra.begin(), palabra.end());
+        arbol.insertarPalabra(palabra);
+    }
+    arbolInvertidoInicializado = true;
+    std::cout << "Árbol inverso inicializado correctamente." << std::endl;
+}
+
+
+void Interfaz_Scrabble::buscarPalabrasPorPrefijo(Nodo* nodo, const std::string& prefijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas) {
+    if (nodo->esFinalDePalabra()) {
+        palabrasEncontradas.push_back(palabra);
+    }
+    for (const auto& par : nodo->getHijos()) {
+        buscarPalabrasPorPrefijo(par.second, prefijo, palabra + par.first, palabrasEncontradas);
+    }
+}
+
+void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
+  if (!arbolInicializado) {
+        std::cerr << "Error: El árbol inverso no ha sido inicializado." << std::endl;
+        return;
+    }
+
+    Nodo* nodoActual = arbol.getRaiz();
+    for (char c : prefijo) {
+        if (!nodoActual->tieneHijo(c)) {
+            std::cerr << "No se encontraron palabras con el prefijo: " << prefijo << std::endl;
+            return;
+        }
+        nodoActual = nodoActual->getHijo(c);
+    }
+    std::vector<std::string> palabrasEncontradas;
+    buscarPalabrasPorPrefijo(nodoActual, prefijo, prefijo, palabrasEncontradas);
+    if (!palabrasEncontradas.empty()) {
+        std::cout << "Palabras encontradas con el prefijo '" << prefijo << "':" << std::endl;
+        int indice = 1;
+        for (const std::string& palabra : palabrasEncontradas) {
+            int puntaje = puntajePalabra(palabra);
+            std::cout << indice << ". " << palabra << " (Longitud: " << palabra.size() << ", Puntaje: " << puntaje << ")" << std::endl;
+            indice++;
         }
     } else {
-        std::cout << "(Árbol ya inicializado) El árbol del diccionario inverso ya ha sido inicializado.\n";
+        std::cerr << "No se encontraron palabras con el prefijo: " << prefijo << std::endl;
     }
 }
 
-// Función para buscar palabras que comienzan con un prefijo específico en el árbol de palabras.
-void Interfaz_Scrabble::buscarPalabrasPorPrefijo(Nodo* nodo, const std::string& prefijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas) {
-    // Verificar si el nodo es nulo.
-    if (!nodo) {
-        return;
-    }
 
-    // Si la palabra actual tiene una longitud igual o mayor al prefijo
-    // y el prefijo coincide con el inicio de la palabra, entonces la palabra es una coincidencia.
-    if (palabra.length() >= prefijo.length() && palabra.substr(0, prefijo.length()) == prefijo) {
-        palabrasEncontradas.push_back(palabra);
-    }
 
-    // Recorrer el alfabeto de 'a' a 'z' para buscar los hijos del nodo actual.
-    for (char c = 'a'; c <= 'z'; ++c) {
-        if (nodo->tieneHijo(c)) {
-            // Obtener el hijo correspondiente al caracter 'c'.
-            Nodo* hijo = nodo->getHijo(c);
-            // Llamar recursivamente a la función para cada hijo del nodo.
-            buscarPalabrasPorPrefijo(hijo, prefijo, palabra + c, palabrasEncontradas);
-        }
-    }
-}
-
-// Función para buscar palabras que comienzan con un prefijo específico 
-void Interfaz_Scrabble::palabrasPorPrefijo(std::string prefijo) {
-    // Convertir el prefijo a minúsculas.
-    std::transform(prefijo.begin(), prefijo.end(), prefijo.begin(), ::tolower);
-
-    // Verificar si el árbol está inicializado.
-    if (!arbolInicializado) {
-        std::cerr << "(Árbol no inicializado) Debe inicializar el árbol primero." << std::endl;
-        return;
-    }
-
-    std::cout << "Buscando palabras que comienzan con el prefijo '" << prefijo << "'..." << std::endl;
-
-    // Vector para almacenar las palabras encontradas.
-    std::vector<std::string> palabrasEncontradas;
-    
-    // Llamar a la función buscarPalabrasPorPrefijo con el nodo raíz del árbol y el prefijo dado.
-    buscarPalabrasPorPrefijo(arbol.getRaiz(), prefijo, "", palabrasEncontradas);
-
-    // Verificar si se encontraron palabras.
-    if (palabrasEncontradas.empty()) {
-        std::cerr << "(Prefijo inválido) No se encontraron palabras que comiencen con el prefijo '" << prefijo << "'." << std::endl;
-        return;
-    }
-    std::cout << "--------------------------------" << std::endl;
-    std::cout << "(Resultado exitoso) Las palabras que inician con el prefijo '" << prefijo << "' son:" << std::endl;
-    std::cout << "------------------------------------" << std::endl;
-    
-    // Mostrar las palabras encontradas junto con su longitud y puntaje.
-    for (const auto& palabra : palabrasEncontradas) {
-        int puntaje = puntajePalabra(palabra);
-        if (puntaje == -1) {
-            std::cerr << "Error: No se pudo calcular el puntaje para la palabra '" << palabra << "'." << std::endl;
-        } else {
-            std::cout << "........................." << std::endl;
-            std::cout << palabra << " - Longitud: " << palabra.length() << " - Puntaje: " << puntaje << std::endl;
-        }
-    }
-}
-
-// Función para buscar palabras que terminan con un sufijo específico en el árbol de palabras.
 void Interfaz_Scrabble::buscarPalabrasPorSufijo(Nodo* nodo, const std::string& sufijo, const std::string& palabra, std::vector<std::string>& palabrasEncontradas) {
-    // Verificar si el nodo es nulo.
-    if (!nodo) {
-        return;
+    if (nodo->esFinalDePalabra()) {
+        std::string palabraOriginal = palabra;
+        std::reverse(palabraOriginal.begin(), palabraOriginal.end());
+        palabrasEncontradas.push_back(palabraOriginal);
     }
-
-    // Si la palabra actual tiene una longitud igual o mayor al sufijo
-    // y el sufijo coincide con el final de la palabra, entonces la palabra es una coincidencia.
-    if (palabra.length() >= sufijo.length() && palabra.substr(palabra.length() - sufijo.length()) == sufijo) {
-        palabrasEncontradas.push_back(palabra);
-    }
-
-    // Recorrer todos los hijos del nodo actual.
     for (const auto& par : nodo->getHijos()) {
-        char caracter = par.first;
-        Nodo* hijo = par.second;
-        
-        // Llamar recursivamente a la función para cada hijo del nodo.
-        buscarPalabrasPorSufijo(hijo, sufijo, palabra + caracter, palabrasEncontradas);
+        buscarPalabrasPorSufijo(par.second, sufijo, palabra + par.first, palabrasEncontradas);
     }
 }
 
-// Función para buscar palabras que terminan con un sufijo específico y mostrarlas en la salida estándar.
 void Interfaz_Scrabble::palabrasPorSufijo(std::string sufijo) {
-    // Convertir el sufijo a minúsculas.
-    std::transform(sufijo.begin(), sufijo.end(), sufijo.begin(), ::tolower);
+    if (!arbolInvertidoInicializado) {
+        std::cerr << "Error: El árbol inverso no ha sido inicializado." << std::endl;
+        return;
+    }
 
-    // Vector para almacenar las palabras encontradas.
-    std::vector<std::string> palabrasEncontradas;
+    // Invertir el sufijo para buscar en el árbol inverso
+    std::reverse(sufijo.begin(), sufijo.end());
     
-    // Llamar a la función buscarPalabrasPorSufijo con el nodo raíz del árbol y el sufijo dado.
-    buscarPalabrasPorSufijo(arbol.getRaiz(), sufijo, "", palabrasEncontradas); // 'arbol' es el árbol del diccionario
-    
-    // Mostrar las palabras encontradas en la salida estándar.
-    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
-    std::cout << "(Resultado exitoso) Las palabras que terminan con el sufijo '" << sufijo << "' son:" << std::endl;
-    std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
-
-    for (const auto& palabra : palabrasEncontradas) {
-       // Calcular el puntaje de la palabra.
-       int puntaje = puntajePalabra(palabra);
-       // Verificar si se pudo calcular el puntaje.
-       if (puntaje == -1) {
-            std::cerr << "Error: No se pudo calcular el puntaje para la palabra '" << palabra << "'." << std::endl;
-        } else {
-            // Mostrar la palabra, su longitud y su puntaje.
-            std::cout << "................................." << std::endl;
-            std::cout << palabra << " - Longitud: " << palabra.length() << " - Puntaje: " << puntaje << std::endl;
+    Nodo* nodoActual = arbol.getRaiz();
+    for (char c : sufijo) {
+        if (!nodoActual->tieneHijo(c)) {
+            std::cerr << "Sufijo inválido: Sufijo " << sufijo << " no pudo encontrarse en el diccionario." << std::endl;
+            return;
         }
+        nodoActual = nodoActual->getHijo(c);
+    }
+    
+    std::vector<std::string> palabrasEncontradas;
+    buscarPalabrasPorSufijo(nodoActual, sufijo, sufijo, palabrasEncontradas);
+    
+    if (!palabrasEncontradas.empty()) {
+        std::cout << "Las palabras que terminan con este sufijo son:" << std::endl;
+        int indice = 1;
+        for (const std::string& palabra : palabrasEncontradas) {
+            int puntaje = puntajePalabra(palabra);
+            std::cout << indice << ". " << palabra << " (Longitud: " << palabra.size() << ", Puntaje: " << puntaje << ")" << std::endl;
+            indice++;
+        }
+    } else {
+        std::cerr << "Sufijo inválido: Sufijo " << sufijo << " no pudo encontrarse en el diccionario." << std::endl;
     }
 }
 
 
 void Interfaz_Scrabble::grafoDePalabras() {
-  // Implementación de construcción de grafo de palabras
-  std::cout << "Falta implementar la construccion del grafo de palabras\n"
-            << std::endl;
+    if (!diccionarioOriginalInicializado) {
+        std::cerr << "Error: El diccionario  no ha sido inicializado." << std::endl;
+        return;
+    }
+    
+    grafo.construirGrafo(std::vector<std::string>(diccionario.begin(), diccionario.end()));
+    grafoInicializado = true;
+    std::cout << "Grafo construido correctamente." << std::endl;
+    /*if(grafoInicializado == true){
+      std::cout << "Si se puso en true" << std::endl;
+    }else{
+      std::cout << "No" << std::endl;
+    }*/
 }
 
-void Interfaz_Scrabble::posiblesPalabras() {
-  // Implementación de búsqueda de posibles palabras
-  std::cout << "Falta implementar la busqueda de posibles palabras\n"
-            << std::endl;
+bool Interfaz_Scrabble::esCadenaValida(const std::string& letras) {
+    for (char c : letras) {
+        if (!isalpha(c) && c != '?') {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*void Interfaz_Scrabble::generarPermutaciones(const std::string& letras, std::string palabraActual, std::unordered_set<std::string>& resultados, Grafo& grafo, const std::unordered_set<std::string>& diccionario) {
+    // Depuración: Mostrar la palabra actual y el conjunto de resultados
+    std::cout << "Generando permutaciones para la palabra actual: " << palabraActual << std::endl;
+
+    if (diccionario.find(palabraActual) != diccionario.end()) {
+        resultados.insert(palabraActual);
+        for (const auto& vecino : grafo.obtenerVecinos(palabraActual)) {
+            resultados.insert(vecino);
+        }
+    }
+
+    if (palabraActual.size() < letras.size()) {
+        for (size_t i = 0; i < letras.size(); ++i) {
+            if (letras[i] != '?') {
+                std::string nuevaPalabraActual = palabraActual + letras[i];
+                std::string nuevaLetras = letras.substr(0, i) + letras.substr(i + 1);
+                generarPermutaciones(nuevaLetras, nuevaPalabraActual, resultados, grafo, diccionario);
+            } else {
+                for (char c = 'a'; c <= 'z'; ++c) {
+                    std::string nuevaPalabraActual = palabraActual + c;
+                    std::string nuevaLetras = letras.substr(0, i) + letras.substr(i + 1);
+                    generarPermutaciones(nuevaLetras, nuevaPalabraActual, resultados, grafo, diccionario);
+                }
+            }
+        }
+    }
+}
+*/
+
+void Interfaz_Scrabble::generarPermutaciones(const std::string& letras, std::string palabraActual, std::unordered_set<std::string>& resultados, Grafo& grafo, const std::unordered_set<std::string>& diccionario) {
+    // Depuración: Mostrar la palabra actual
+    std::cout << "Generando permutaciones para la palabra actual: " << palabraActual << std::endl;
+
+    // Generar todas las permutaciones primero
+    if (!palabraActual.empty()) {
+        resultados.insert(palabraActual);
+    }
+
+    // Generar permutaciones recursivamente
+    for (size_t i = 0; i < letras.size(); ++i) {
+        char letraActual = letras[i];
+
+        // Si es un comodín, generar todas las posibles letras del alfabeto
+        if (letraActual == '?') {
+            for (char c = 'a'; c <= 'z'; ++c) {
+                std::string nuevaPalabra = palabraActual + c;
+                std::string nuevasLetras = letras.substr(0, i) + letras.substr(i + 1);
+                generarPermutaciones(nuevasLetras, nuevaPalabra, resultados, grafo, diccionario);
+            }
+        } else { // Si es una letra normal, simplemente agregarla a la palabra actual
+            std::string nuevaPalabra = palabraActual + letraActual;
+            std::string nuevasLetras = letras.substr(0, i) + letras.substr(i + 1);
+            generarPermutaciones(nuevasLetras, nuevaPalabra, resultados, grafo, diccionario);
+        }
+    }
+
+    // Verificar si la palabra actual es válida y está en el diccionario
+    if (!palabraActual.empty() && diccionario.find(palabraActual) != diccionario.end()) {
+        resultados.insert(palabraActual);
+    }
+}
+
+
+void Interfaz_Scrabble::posiblesPalabras(std::string letras) {
+    std::transform(letras.begin(), letras.end(), letras.begin(), ::tolower);
+    if (!esCadenaValida(letras)) {
+        std::cerr << "Letras inválidas: La cadena letras contiene símbolos inválidos." << std::endl;
+        return;
+    }
+
+    // Verificar que los diccionarios y el grafo estén inicializados
+    if (!diccionarioOriginalInicializado || !grafoInicializado) {
+        std::cerr << "Error: Los archivos no han sido inicializados correctamente." << std::endl;
+        return;
+    }
+
+    std::unordered_set<std::string> resultados;
+    generarPermutaciones(letras, "", resultados, grafo, diccionario);
+
+    std::vector<std::string> palabrasValidas;
+    for (const auto& palabra : resultados) {
+        if (diccionario.find(palabra) != diccionario.end()) {
+            palabrasValidas.push_back(palabra);
+        }
+    }
+
+    if (!palabrasValidas.empty()) {
+        std::cout << "Las posibles palabras a construir con las letras " << letras << " son:" << std::endl;
+        for (const auto& palabra : palabrasValidas) {
+            int puntaje = puntajePalabra(palabra);
+            int indice = 1;
+            std::cout<<indice <<"." << palabra << " (Longitud: " << palabra.size() << ", Puntaje: " << puntaje << ")" << std::endl;
+            indice ++;
+        }
+    } else {
+        std::cout << "No se encontraron palabras válidas con las letras proporcionadas." << std::endl;
+    }
 }
